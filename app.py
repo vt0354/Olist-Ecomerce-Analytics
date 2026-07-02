@@ -3,7 +3,6 @@ import gdown
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import joblib
 
 st.set_page_config(
     page_title="Olist E-commerce Analytics",
@@ -60,15 +59,14 @@ page = st.sidebar.radio(
         "Sales Analysis",
         "Customer Segmentation",
         "CLV Analysis",
-        "Propensity Model",
-        "Live Prediction"
+        "Propensity Model"
     ]
 )
 
 st.title("🛒 Olist E-commerce Analytics Dashboard")
 
 # =========================
-# PAGE 1
+# PAGE 1: EXECUTIVE OVERVIEW
 # =========================
 
 if page == "Executive Overview":
@@ -101,7 +99,6 @@ if page == "Executive Overview":
         markers=True,
         title="Monthly Revenue Trend"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
     state_rev = (
@@ -117,11 +114,10 @@ if page == "Executive Overview":
         y="payment_value",
         title="Top States by Revenue"
     )
-
     st.plotly_chart(fig2, use_container_width=True)
 
 # =========================
-# PAGE 2
+# PAGE 2: SALES ANALYSIS
 # =========================
 
 elif page == "Sales Analysis":
@@ -142,7 +138,6 @@ elif page == "Sales Analysis":
         orientation="h",
         title="Top Product Categories by Revenue"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
     payment_rev = (
@@ -157,7 +152,6 @@ elif page == "Sales Analysis":
         values="payment_value",
         title="Revenue by Payment Type"
     )
-
     st.plotly_chart(fig2, use_container_width=True)
 
     city_orders = (
@@ -174,11 +168,10 @@ elif page == "Sales Analysis":
         y="order_id",
         title="Top Cities by Orders"
     )
-
     st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# PAGE 3
+# PAGE 3: CUSTOMER SEGMENTATION
 # =========================
 
 elif page == "Customer Segmentation":
@@ -196,7 +189,6 @@ elif page == "Customer Segmentation":
         values="customer_unique_id",
         title="Customer Segment Distribution"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
     segment_revenue = (
@@ -211,7 +203,6 @@ elif page == "Customer Segmentation":
         y="Monetary",
         title="Revenue by RFM Segment"
     )
-
     st.plotly_chart(fig2, use_container_width=True)
 
     fig3 = px.scatter(
@@ -221,11 +212,10 @@ elif page == "Customer Segmentation":
         color="Segment",
         title="Recency vs Monetary"
     )
-
     st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# PAGE 4
+# PAGE 4: CLV ANALYSIS
 # =========================
 
 elif page == "CLV Analysis":
@@ -239,7 +229,6 @@ elif page == "CLV Analysis":
         y="EstimatedCLV",
         title="Top 20 Customers by Estimated CLV"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
     fig2 = px.histogram(
@@ -248,7 +237,6 @@ elif page == "CLV Analysis":
         nbins=50,
         title="CLV Distribution"
     )
-
     st.plotly_chart(fig2, use_container_width=True)
 
     if "CLVSegment" in clv.columns:
@@ -264,11 +252,10 @@ elif page == "CLV Analysis":
             y="customer_unique_id",
             title="Customers by CLV Segment"
         )
-
         st.plotly_chart(fig3, use_container_width=True)
 
 # =========================
-# PAGE 5
+# PAGE 5: PROPENSITY MODEL
 # =========================
 
 elif page == "Propensity Model":
@@ -283,7 +270,6 @@ elif page == "Propensity Model":
         y="ROC_AUC",
         title="Model Comparison by ROC-AUC"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Top Feature Importance")
@@ -297,7 +283,6 @@ elif page == "Propensity Model":
         orientation="h",
         title="Top 20 Feature Importance"
     )
-
     st.plotly_chart(fig2, use_container_width=True)
 
     segment_count = (
@@ -312,106 +297,8 @@ elif page == "Propensity Model":
         values="customer_unique_id",
         title="Propensity Segment Distribution"
     )
-
     st.plotly_chart(fig3, use_container_width=True)
 
     st.subheader("High Propensity Customers")
     high_customers = propensity[propensity["PropensitySegment"] == "High"]
     st.dataframe(high_customers.head(100))
-
-# =========================
-# PAGE 6
-# =========================
-
-elif page == "Live Prediction":
-    st.header("Live Customer Propensity Prediction")
-
-    try:
-        model = joblib.load("models/propensity_model_improved.pkl")
-
-        recency = st.number_input("Recency", min_value=0, value=30)
-        frequency = st.number_input("Frequency", min_value=1, value=2)
-        monetary = st.number_input("Monetary", min_value=0.0, value=250.0)
-        avg_order_value = st.number_input("Average Order Value", min_value=0.0, value=125.0)
-        max_order_value = st.number_input("Max Order Value", min_value=0.0, value=200.0)
-        min_order_value = st.number_input("Min Order Value", min_value=0.0, value=50.0)
-        avg_review = st.number_input("Average Review", min_value=0.0, max_value=5.0, value=4.0)
-        review_count = st.number_input("Review Count", min_value=0, value=1)
-        total_items = st.number_input("Total Items", min_value=1, value=2)
-        avg_freight = st.number_input("Average Freight", min_value=0.0, value=20.0)
-        total_freight = st.number_input("Total Freight", min_value=0.0, value=40.0)
-        avg_delivery_days = st.number_input("Average Delivery Days", min_value=0.0, value=8.0)
-        avg_delivery_delay = st.number_input("Average Delivery Delay", value=0.0)
-        late_delivery_rate = st.number_input("Late Delivery Rate", min_value=0.0, max_value=1.0, value=0.0)
-        num_categories = st.number_input("Number of Categories", min_value=1, value=1)
-        num_sellers = st.number_input("Number of Sellers", min_value=1, value=1)
-        avg_installments = st.number_input("Average Installments", min_value=1.0, value=1.0)
-        max_installments = st.number_input("Max Installments", min_value=1, value=1)
-        weekend_rate = st.number_input("Weekend Purchase Rate", min_value=0.0, max_value=1.0, value=0.0)
-        avg_purchase_month = st.number_input("Average Purchase Month", min_value=1.0, max_value=12.0, value=6.0)
-        customer_lifetime = st.number_input("Customer Lifetime", min_value=1, value=30)
-        orders_per_month = st.number_input("Orders Per Month", min_value=0.0, value=1.0)
-        items_per_order = st.number_input("Items Per Order", min_value=1.0, value=1.0)
-        freight_ratio = st.number_input("Freight to Revenue Ratio", min_value=0.0, value=0.1)
-
-        customer_state = st.selectbox(
-            "Customer State",
-            sorted(master["customer_state"].dropna().unique())
-        )
-
-        preferred_payment = st.selectbox(
-            "Preferred Payment",
-            sorted(master["payment_type"].dropna().unique())
-        )
-
-        favorite_category = st.selectbox(
-            "Favorite Category",
-            sorted(master["product_category_name_english"].dropna().unique())
-        )
-
-        input_data = pd.DataFrame([{
-            "Recency": recency,
-            "Frequency": frequency,
-            "Monetary": monetary,
-            "AvgOrderValue": avg_order_value,
-            "MaxOrderValue": max_order_value,
-            "MinOrderValue": min_order_value,
-            "AvgReview": avg_review,
-            "ReviewCount": review_count,
-            "TotalItems": total_items,
-            "AvgFreight": avg_freight,
-            "TotalFreight": total_freight,
-            "AvgDeliveryDays": avg_delivery_days,
-            "AvgDeliveryDelay": avg_delivery_delay,
-            "LateDeliveryRate": late_delivery_rate,
-            "NumCategories": num_categories,
-            "NumSellers": num_sellers,
-            "AvgInstallments": avg_installments,
-            "MaxInstallments": max_installments,
-            "WeekendPurchaseRate": weekend_rate,
-            "AvgPurchaseMonth": avg_purchase_month,
-            "CustomerLifetime": customer_lifetime,
-            "OrdersPerMonth": orders_per_month,
-            "ItemsPerOrder": items_per_order,
-            "FreightToRevenueRatio": freight_ratio,
-            "CustomerState": customer_state,
-            "PreferredPayment": preferred_payment,
-            "FavoriteCategory": favorite_category
-        }])
-
-        if st.button("Predict"):
-            score = model.predict_proba(input_data)[0][1]
-
-            if score >= 0.66:
-                segment = "High"
-            elif score >= 0.33:
-                segment = "Medium"
-            else:
-                segment = "Low"
-
-            st.success(f"Propensity Score: {score:.4f}")
-            st.info(f"Customer Segment: {segment}")
-
-    except Exception as e:
-        st.error("Model file not found or prediction failed.")
-        st.write(e)
