@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/15eGIKZgkp55KBaBy_yP7c5lUGxDLnPJb
 """
 
-pip install streamlit
+
 
 import os
 import gdown
